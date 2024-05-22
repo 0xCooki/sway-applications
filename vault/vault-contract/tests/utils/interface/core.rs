@@ -4,7 +4,7 @@ use fuels::{
     programs::{call_response::FuelCallResponse},
 };
 
-pub(crate) async fn create_vault(contract: Vault<WalletUnlocked>, asset: AssetId, unlock_time: u64) -> FuelCallResponse<()> {
+pub(crate) async fn create_vault(contract: Vault<WalletUnlocked>, asset: AssetId, unlock_time: u64) -> FuelCallResponse<u64> {
     contract
         .methods()
         .create_vault(

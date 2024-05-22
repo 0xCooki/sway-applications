@@ -1,4 +1,6 @@
-use fuels::{prelude::*};
+use fuels::{
+    prelude::*
+};
 
 abigen!(Contract(
     name = "Vault",
@@ -6,7 +8,7 @@ abigen!(Contract(
 ),);
 
 
-pub(crate) async fn setup() -> (Vault<WalletUnlocked>, Vec<AssetConfig>, Vec<WalletUnlocked>) {
+pub(crate) async fn setup() -> (Vault<WalletUnlocked>, Vec<AssetConfig>, Vec<WalletUnlocked>, Provider) {
     let number_of_coins = 1;
     let coin_amount = 1_000_000;
     let number_of_wallets = 3;
@@ -42,6 +44,16 @@ pub(crate) async fn setup() -> (Vault<WalletUnlocked>, Vec<AssetConfig>, Vec<Wal
     let _wallet_b = wallets.pop().unwrap();
     let _wallet_c = wallets.pop().unwrap();
 
+    //let provider = wallet_a.try_provider();
+
+    let provider = wallet_a.try_provider().unwrap();
+
+    //let height = provider.latest_block_height();
+
+    //let provider = wallet_a.provider().latest_block_height();
+ 
+    //assert_eq!(provider.latest_block_height().await, 0u32);
+
     let wallets_list = vec![wallet_a.clone(), _wallet_b.clone(), _wallet_c.clone()];
 
     // Vault
@@ -54,7 +66,7 @@ pub(crate) async fn setup() -> (Vault<WalletUnlocked>, Vec<AssetConfig>, Vec<Wal
     .await
     .unwrap();
 
-    let instance = Vault::new(id.clone(), wallet_a);
+    let instance = Vault::new(id.clone(), wallet_a.clone());
 
-    (instance, assets, wallets_list)
+    (instance, assets, wallets_list, provider.clone())
 }

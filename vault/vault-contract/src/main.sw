@@ -6,7 +6,11 @@ mod events;
 mod interface;
 
 use data_structures::{VaultInfo};
-use errors::{CreateVaultErrors};
+use errors::{
+    CreateVaultErrors,
+    DepositErrors,
+    WithdrawErrors
+};
 use events::{};
 use interface::{Vault};
 use std::{
@@ -27,33 +31,47 @@ storage {
 }
 
 impl Vault for Contract {
-    #[payable]
     #[storage(read, write)]
     fn create_vault(
         asset: AssetId,
         unlock_time: u64,
-    ) {
-        // Checks - unlock time more than now
+    ) -> u64 {
+        // Checks - unlock time is in the future
         require(
             unlock_time > height().as_u64(),
             CreateVaultErrors::InvalidUnlockTime,
         );
-        require(
-            msg_amount() > 0,
-            CreateVaultErrors::InvalidAmount,
-        );
         
         // Create new Vault Info struct
+        let new_vault_info = VaultInfo::new(
+            msg_sender().unwrap(),
+            asset,
+            unlock_time,
+        );
+
+        // Get the next index
+        let new_vault_id = storage.vault_count.read() + 1;
 
         // Update storage
+        storage.vaults.insert(new_vault_id, new_vault_info);
+
+        return new_vault_id;
+    }
+
+    #[payable]
+    #[storage(read, write)]
+    fn deposit(vault_id: u64) {
+        require(
+            msg_amount() > 0,
+            DepositErrors::InvalidAmount,
+        );
     }
 
     #[storage(read, write)]
-    fn withdraw(deposit_id: u64) {
+    fn withdraw(vault_id: u64) {
         // Checks: 
         //    only depositer can withdraw
         //    time has elapsed
         //    is active
-
     }
 }

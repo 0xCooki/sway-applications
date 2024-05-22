@@ -4,13 +4,16 @@ library;
 
 /// todo - extensive documentation
 abi Vault {
-    #[payable]
     #[storage(read, write)]
     fn create_vault(
         asset: AssetId,
         unlock_time: u64,
-    );
+    ) -> u64;
+
+    #[payable]
+    #[storage(read, write)]
+    fn deposit(vault_id: u64);
 
     #[storage(read, write)]
-    fn withdraw(deposit_id: u64);
+    fn withdraw(vault_id: u64);
 }
